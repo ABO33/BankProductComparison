@@ -1,0 +1,41 @@
+﻿@model IEnumerable<BusinessLogic.Models.Deposit>
+
+@{
+    ViewData["Title"] = "Deposit Catalog";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Bank</th>
+            <th>Currency</th>
+            <th>Rate %</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@d.Id">
+                        @d.Name
+                    </a>
+                </td>
+                <td>@d.BankName</td>
+                <td>@d.Currency</td>
+                <td>@d.InterestRate</td>
+                <td>
+                    <a class="btn btn-primary btn-sm"
+                       asp-action="Calculate"
+                       asp-route-id="@d.Id">
+                        Calculate
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

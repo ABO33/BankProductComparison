@@ -1,0 +1,23 @@
+﻿@model BusinessLogic.Models.Deposit
+
+@{
+    ViewData["Title"] = "Deposit Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <tr><th>Name</th><td>@Model.Name</td></tr>
+    <tr><th>Bank</th><td>@Model.BankName</td></tr>
+    <tr><th>Currency</th><td>@Model.Currency</td></tr>
+    <tr><th>Min Amount</th><td>@Model.MinAmount</td></tr>
+    <tr><th>Max Amount</th><td>@Model.MaxAmount</td></tr>
+    <tr>
+        <th>Term (months)</th>
+        <td>@Model.MinTermMonths – @Model.MaxTermMonths</td>
+    </tr>
+    <tr><th>Interest Rate %</th><td>@Model.InterestRate</td></tr>
+    <tr><th>Tax Rate %</th><td>@Model.TaxRate</td></tr>
+</table>
+
+<a class="btn btn-secondary" asp-action="Index">Back to Catalog</a>
