@@ -1,134 +1,151 @@
 ﻿@{
     ViewData["Title"] = "Сравни Депозити";
     var offers = ViewData["OfferCount"];
-    var banks  = ViewData["BankCount"];
+    var banks = ViewData["BankCount"];
+    var currencies = (List<string>)ViewData["Currencies"]!;
+    var payouts = (List<string>)ViewData["Payouts"]!;
 }
 
 <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-  <div class="card p-4 shadow-sm" style="max-width:450px; width:100%; background:rgba(255,255,255,0.95);">
-    <h2 class="text-center text-primary mb-2">
-      Депозит<br/>намерете най-добрата оферта
-    </h2>
-    <p class="text-center text-muted mb-4">
-      Сравнете <strong>@offers</strong> оферти от <strong>@banks</strong> банки
-    </p>
+    <div class="card p-4 shadow-sm"
+         style="max-width:450px; width:100%; background:rgba(255,255,255,0.95);">
+        <h2 class="text-center text-primary mb-2">
+            Депозит<br />намерете най-добрата оферта
+        </h2>
+        <p class="text-center text-muted mb-4">
+            Сравнете <strong>@offers</strong> оферти от <strong>@banks</strong> банки
+        </p>
 
-    <form>
-      <!-- 1) Deposit type -->
-      <div class="mb-4">
-        <label class="form-label fw-bold">ВИД ДЕПОЗИТ</label>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="depositType" id="std" checked>
-          <label class="form-check-label" for="std">
-            СТАНДАРТЕН СРОЧЕН ДЕПОЗИТ
-          </label>
-        </div>
-      </div>
+        <form asp-action="Results" method="get">
+            <!-- 1) Deposit type (static) -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">ВИД ДЕПОЗИТ</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="depositType" id="std" value="standard" checked>
+                    <label class="form-check-label" for="std">
+                        СТАНДАРТЕН СРОЧЕН ДЕПОЗИТ
+                    </label>
+                </div>
+            </div>
 
-      <!-- 2) Amount & Currency -->
-      <div class="row g-3 mb-3">
-        <div class="col-6">
-          <label class="form-label">РАЗМЕР НА ДЕПОЗИТА</label>
-          <div class="input-group">
-            <button type="button" class="btn btn-outline-secondary">−</button>
-            <input type="number" class="form-control text-center" value="10000" />
-            <button type="button" class="btn btn-outline-secondary">＋</button>
-          </div>
-        </div>
-        <div class="col-6">
-          <label class="form-label">ВАЛУТА</label>
-          <select class="form-select">
-            <option>BGN</option>
-            <option>EUR</option>
-            <option>USD</option>
-          </select>
-        </div>
-      </div>
+            <!-- 2) Amount & Currency -->
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">РАЗМЕР НА ДЕПОЗИТА</label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-secondary">−</button>
+                        <input type="number" name="amount"
+                               class="form-control text-center" value="10000" />
+                        <button type="button" class="btn btn-outline-secondary">＋</button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">ВАЛУТА</label>
+                    <select name="currency" class="form-select">
+                        @foreach (var c in currencies)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                </div>
+            </div>
 
-      <!-- 3) Term & Interest payment -->
-      <div class="row g-3 mb-3">
-        <div class="col-6">
-          <label class="form-label">СРОК НА ДЕПОЗИТА</label>
-          <select class="form-select">
-            <option>12 месеца</option>
-            <option>6 месеца</option>
-            <option>24 месеца</option>
-          </select>
-        </div>
-        <div class="col-6">
-          <label class="form-label">ИЗПЛАЩАНЕ НА ЛИХВИ</label>
-          <select class="form-select">
-            <option>Без значение</option>
-            <option>Месечно</option>
-            <option>Годишно</option>
-          </select>
-        </div>
-      </div>
+            <!-- 3) Term & Interest payment -->
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">СРОК НА ДЕПОЗИТА</label>
+                    <select name="term" class="form-select">
+                        <option value="1">1 месец</option>
+                        <option value="3">3 месеца</option>
+                        <option value="6">6 месеца</option>
+                        <option value="9">9 месеца</option>
+                        <option value="12" selected>12 месеца</option>
+                        <option value="18">18 месеца</option>
+                        <option value="24">24 месеца</option>
+                        <option value="36">36 месеца</option>
+                        <option value="48">48 месеца</option>
+                        <option value="60">60 месеца</option>
+                        <option value="120">120 месеца</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">ИЗПЛАЩАНЕ НА ЛИХВИ</label>
+                    <select name="payout" class="form-select">
+                        @foreach (var p in payouts)
+                        {
+                            <option value="@p">@p</option>
+                        }
+                    </select>
+                </div>
+            </div>
 
-      <!-- 4) For whom & Accrual -->
-      <div class="row g-3 mb-3">
-        <div class="col-6">
-          <label class="form-label">ЗА КОГО Е ДЕПОЗИТА</label>
-          <select class="form-select">
-            <option>Без значение</option>
-            <option>Физически лица</option>
-            <option>Юридически лица</option>
-          </select>
-        </div>
-        <div class="col-6">
-          <label class="form-label">ДОВНАСЯНЕ НА СУМИ</label>
-          <select class="form-select">
-            <option>Без значение</option>
-            <option>Позволено</option>
-            <option>Не е позволено</option>
-          </select>
-        </div>
-      </div>
+            <!-- 4) For whom & Top-up -->
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">ЗА КОГО Е ДЕПОЗИТА</label>
+                    <select name="forWho" class="form-select">
+                        <option>Всички</option>
+                        <option>Физически лица</option>
+                        <option>Юридически лица</option>
+                        <option>Пенсионери</option>
+                        <option>Деца</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">ДОВНАСЯНЕ НА СУМИ</label>
+                    <select name="topUp" class="form-select">
+                        <option>Всички</option>
+                        <option>Позволено</option>
+                        <option>Не е позволено</option>
+                    </select>
+                </div>
+            </div>
 
-      <!-- 5) Interest type & Overdraft -->
-      <div class="row g-3 mb-3">
-        <div class="col-6">
-          <label class="form-label">ВИД ЛИХВА</label>
-          <select class="form-select">
-            <option>Без значение</option>
-            <option>Постоянна</option>
-            <option>Променлива</option>
-          </select>
-        </div>
-        <div class="col-6">
-          <label class="form-label">ВЪЗМОЖНОСТ ЗА ОВЪРДРАФТ</label>
-          <select class="form-select">
-            <option>Без значение</option>
-            <option>Да</option>
-            <option>Не</option>
-          </select>
-        </div>
-      </div>
+            <!-- 5) Interest type & Overdraft -->
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">ВИД ЛИХВА</label>
+                    <select name="interestType" class="form-select">
+                        <option>Всички</option>
+                        <option>Фиксирана</option>
+                        <option>Променлива</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">ВЪЗМОЖНОСТ ЗА ОВЪРДРАФТ</label>
+                    <select name="overdraft" class="form-select">
+                        <option>Всички</option>
+                        <option>Да</option>
+                        <option>Не</option>
+                    </select>
+                </div>
+            </div>
 
-      <!-- 6) Credit facility -->
-      <div class="mb-4">
-        <label class="form-label">ВЪЗМОЖНОСТ ЗА КРЕДИТ</label>
-        <select class="form-select">
-          <option>Без значение</option>
-          <option>Да</option>
-          <option>Не</option>
-        </select>
-      </div>
+            <!-- 6) Credit facility -->
+            <div class="mb-4">
+                <label class="form-label">ВЪЗМОЖНОСТ ЗА КРЕДИТ</label>
+                <select name="credit" class="form-select">
+                    <option>Всички</option>
+                    <option>Да</option>
+                    <option>Не</option>
+                </select>
+            </div>
 
-      <!-- Compare button -->
-      <button type="submit"
-              class="btn"
-              style="width:100%;background:#f2955a;color:#fff;font-weight:600;">
-        СРАВНИ ОФЕРТИ
-      </button>
+            <!-- Compare button -->
+            <button type="submit"
+                    class="btn"
+                    style="width:100%;background:#f2955a;color:#fff;font-weight:600;">
+                СРАВНИ ОФЕРТИ
+            </button>
 
-      <!-- Quick compare -->
-      <div class="text-center mt-3">
-        <span style="font-size:1.2rem;">🔍</span>
-        <a asp-action="Index" class="ms-2 text-decoration-none text-muted">
-          Бързо сравнение
-        </a>
-      </div>
-    </form>
-  </div>
+            <!-- Quick compare -->
+            <div class="text-center mt-3">
+                <span style="font-size:1.2rem;">🔍</span>
+                <a asp-action="Index" class="ms-2 text-decoration-none text-muted">
+                    Бързо сравнение
+                </a>
+            </div>
+        </form>
+    </div>
 </div>

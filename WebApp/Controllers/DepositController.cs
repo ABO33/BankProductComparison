@@ -19,27 +19,15 @@ namespace WebApp.Controllers
             _calculator = calculator;
         }
 
-        /// <summary>
-        /// GET /Deposit/
-        /// Shows the filter form (landing for deposits).
-        /// </summary>
+        /// GET /Deposit/Index
+        /// Shows the filter form, with dynamic dropdowns for currency & payout
+        [HttpGet]
         public IActionResult Index()
         {
             ViewData["OfferCount"] = _context.DepositCatalogs.Count();
-            ViewData["BankCount"] = _context.DepositCatalogs
-                                          .Select(d => d.BankName)
-                                          .Distinct()
-                                          .Count();
-            return View();
-        }
+            ViewData["BankCount"] = _context.DepositCatalogs.Select(d => d.BankName).Distinct().Count();
 
-        /// <summary>
-        /// GET /Deposit/Catalog
-        /// Shows the full catalog of deposit offers with optional filters.
-        /// </summary>
-        public IActionResult Catalog(string currency = "Всички", string payout = "Всички")
-        {
-            // Build dropdown lists
+            // dynamic dropdown values
             var currencies = _context.DepositCatalogs
                                      .Select(d => d.Currency!)
                                      .Distinct()
@@ -54,24 +42,83 @@ namespace WebApp.Controllers
             ViewData["Currencies"] = new[] { "Всички" }.Concat(currencies).ToList();
             ViewData["Payouts"] = new[] { "Всички" }.Concat(payouts).ToList();
 
-            // Apply filters
-            var query = _context.DepositCatalogs.AsQueryable();
-            if (currency != "Всички")
-                query = query.Where(d => d.Currency == currency);
-            if (payout != "Всички")
-                query = query.Where(d => d.InterestPayout == payout);
+            return View();
+        }
 
-            // Execute and return
-            var list = query.OrderBy(d => d.BankName)
-                            .ThenBy(d => d.DepositName)
-                            .ToList();
+        /// GET /Deposit/Results
+        /// Applies the two filters and displays only matching deposits
+        [HttpGet]
+        public IActionResult Results(string depositType,
+                                     decimal amount,
+                                     string currency = "Всички",
+                                     int term = 0,
+                                     string payout = "Всички",
+                                     string forWho = "Всички",
+                                     string topUp = "Всички",
+                                     string interestType = "Всички",
+                                     string overdraft = "Всички",
+                                     string credit = "Всички")
+        {
+            // Re-populate dropdown lists
+            var currencies = _context.DepositCatalogs
+                                     .Select(d => d.Currency!)
+                                     .Distinct()
+                                     .OrderBy(c => c)
+                                     .ToList();
+            var payouts = _context.DepositCatalogs
+                                     .Select(d => d.InterestPayout!)
+                                     .Distinct()
+                                     .OrderBy(p => p)
+                                     .ToList();
+            ViewData["Currencies"] = new[] { "Всички" }.Concat(currencies).ToList();
+            ViewData["Payouts"] = new[] { "Всички" }.Concat(payouts).ToList();
+
+            // Build query
+            var query = _context.DepositCatalogs.AsQueryable();
+            if (currency != "Всички") query = query.Where(d => d.Currency == currency);
+            if (payout != "Всички") query = query.Where(d => d.InterestPayout == payout);
+            // (you can add similar filters for depositType, term, forWho, etc.)
+
+            var list = query
+                .OrderBy(d => d.BankName)
+                .ThenBy(d => d.DepositName)
+                .ToList();
+
             return View(list);
         }
 
-        /// <summary>
-        /// GET /Deposit/Details/{id}
-        /// Shows detailed info for a single deposit.
-        /// </summary>
+        /// GET /Deposit/Catalog
+        /// Your existing full catalog (unchanged)
+        [HttpGet]
+        public IActionResult Catalog(string currency = "Всички", string payout = "Всички")
+        {
+            // dynamic dropdowns as before
+            var currencies = _context.DepositCatalogs
+                                     .Select(d => d.Currency!)
+                                     .Distinct()
+                                     .OrderBy(c => c)
+                                     .ToList();
+            var payouts = _context.DepositCatalogs
+                                     .Select(d => d.InterestPayout!)
+                                     .Distinct()
+                                     .OrderBy(p => p)
+                                     .ToList();
+            ViewData["Currencies"] = new[] { "Всички" }.Concat(currencies).ToList();
+            ViewData["Payouts"] = new[] { "Всички" }.Concat(payouts).ToList();
+
+            var query = _context.DepositCatalogs.AsQueryable();
+            if (currency != "Всички") query = query.Where(d => d.Currency == currency);
+            if (payout != "Всички") query = query.Where(d => d.InterestPayout == payout);
+
+            var list = query
+                .OrderBy(d => d.BankName)
+                .ThenBy(d => d.DepositName)
+                .ToList();
+
+            return View(list);
+        }
+
+        /// GET /Deposit/Details/{id}  (unchanged)
         public IActionResult Details(int id)
         {
             var deposit = _context.DepositCatalogs.Find(id);
@@ -79,10 +126,7 @@ namespace WebApp.Controllers
             return View(deposit);
         }
 
-        /// <summary>
-        /// GET /Deposit/Calculate/{id}
-        /// Shows the calculation form for a business‐logic deposit.
-        /// </summary>
+        /// GET+POST /Deposit/Calculate/{id}  (unchanged)
         public IActionResult Calculate(int id)
         {
             var deposit = _context.Deposits.Find(id);
@@ -90,22 +134,18 @@ namespace WebApp.Controllers
             return View(new CalculationViewModel { Deposit = deposit });
         }
 
-        /// <summary>
-        /// POST /Deposit/Calculate/{id}
-        /// Processes the calculation request.
-        /// </summary>
         [HttpPost]
         public IActionResult Calculate(int id, CalculationViewModel model)
         {
             model.Deposit = _context.Deposits.Find(id)!;
             try
             {
-                var parameters = new BusinessLogic.Models.CalculationParameters
+                var p = new BusinessLogic.Models.CalculationParameters
                 {
                     Amount = model.Amount,
                     TermMonths = model.TermMonths
                 };
-                model.Result = _calculator.Calculate(id, parameters);
+                model.Result = _calculator.Calculate(id, p);
             }
             catch (Exception ex)
             {
@@ -114,13 +154,7 @@ namespace WebApp.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// GET /Deposit/Error
-        /// Generic error page.
-        /// </summary>
-        public IActionResult Error() => View();
-
-        // Sub‐pages under Deposits & Accounts (work in progress)
+        // WorkInProgress stubs (unchanged)
         public IActionResult MobileBanking() => View("WorkInProgress");
         public IActionResult CompareSavings() => View("WorkInProgress");
         public IActionResult SavingsCatalog() => View("WorkInProgress");

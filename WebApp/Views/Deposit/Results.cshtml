@@ -1,39 +1,155 @@
 ﻿@model List<BusinessLogic.Models.DepositCatalog>
+
 @{
     ViewData["Title"] = "Резултати от сравнение на депозити";
+
+    // dynamic dropdowns
     var currencies = (List<string>)ViewData["Currencies"]!;
     var payouts = (List<string>)ViewData["Payouts"]!;
+
+    // static lists
+    var depositTypes = new[] { "standard" };
+    var termOptions = new[] { "1", "3", "6", "9", "12", "18", "24", "36", "48", "60", "120" };
+    var forWhos = new[] { "Всички", "Физически лица", "Юридически лица", "Пенсионери", "Деца" };
+    var topUps = new[] { "Всички", "Позволено", "Не е позволено" };
+    var interestTypes = new[] { "Всички", "Фиксирана", "Променлива" };
+    var overdrafts = new[] { "Всички", "Да", "Не" };
+    var credits = new[] { "Всички", "Да", "Не" };
+
+    // pull selections from querystring
+    string selType = Context.Request.Query["depositType"].FirstOrDefault() ?? "standard";
+    string selAmount = Context.Request.Query["amount"].FirstOrDefault() ?? "10000";
+    string selCurr = Context.Request.Query["currency"].FirstOrDefault() ?? "Всички";
+    string selTerm = Context.Request.Query["term"].FirstOrDefault() ?? "12";
+    string selPayout = Context.Request.Query["payout"].FirstOrDefault() ?? "Всички";
+    string selForWho = Context.Request.Query["forWho"].FirstOrDefault() ?? "Всички";
+    string selTopUp = Context.Request.Query["topUp"].FirstOrDefault() ?? "Всички";
+    string selIntType = Context.Request.Query["interestType"].FirstOrDefault() ?? "Всички";
+    string selOvrd = Context.Request.Query["overdraft"].FirstOrDefault() ?? "Всички";
+    string selCredit = Context.Request.Query["credit"].FirstOrDefault() ?? "Всички";
 }
 
 <h1 class="landing-title">Резултати от сравнение на депозити</h1>
 
-@* Re-render the same filter form *@
-<form asp-action="Results" method="post" class="row g-3 align-items-end mb-4">
-    <div class="col-auto">
-        <label class="form-label fw-bold">ФИЛТРИРАЙ ПО:</label>
+<form asp-action="Results" method="get" class="row g-3 align-items-end mb-4">
+    <!-- 1) Deposit Type -->
+    <div class="col-12">
+        <label class="form-label fw-bold">ВИД ДЕПОЗИТ</label>
+        @foreach (var dt in depositTypes)
+        {
+            <div class="form-check form-check-inline">
+                <input class="form-check-input"
+                       type="radio"
+                       name="depositType"
+                       value="@dt"
+                       checked="@(dt==selType)" />
+                <label class="form-check-label">СТАНДАРТЕН СРОЧЕН ДЕПОЗИТ</label>
+            </div>
+        }
     </div>
-    <div class="col-auto">
-        <label class="form-label">Валута</label>
+
+    <!-- 2) Amount & Currency -->
+    <div class="col-md-4">
+        <label class="form-label">РАЗМЕР НА ДЕПОЗИТА</label>
+        <div class="input-group">
+            <button type="button" class="btn btn-outline-secondary">−</button>
+            <input type="number"
+                   name="amount"
+                   class="form-control text-center"
+                   value="@selAmount" />
+            <button type="button" class="btn btn-outline-secondary">＋</button>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">ВАЛУТА</label>
         <select name="currency" class="form-select">
             @foreach (var c in currencies)
             {
-                <option value="@c">@c</option>
+                <option value="@c" selected="@(c==selCurr)">@c</option>
             }
         </select>
     </div>
-    <div class="col-auto">
-        <label class="form-label">Изплащане на лихви</label>
+    <div class="col-md-4 text-end">
+        <button type="submit"
+                class="btn btn-lg"
+                style="background:#f2955a;color:#fff;font-weight:600;">
+            ПРИЛОЖИ
+        </button>
+    </div>
+
+    <!-- 3) Term & Payout -->
+    <div class="col-md-3">
+        <label class="form-label">СРОК НА ДЕПОЗИТА</label>
+        <select name="term" class="form-select">
+            @foreach (var t in termOptions)
+            {
+                <option value="@t" selected="@(t==selTerm)">@t месеца</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">ИЗПЛАЩАНЕ НА ЛИХВИ</label>
         <select name="payout" class="form-select">
             @foreach (var p in payouts)
             {
-                <option value="@p">@p</option>
+                <option value="@p" selected="@(p==selPayout)">@p</option>
             }
         </select>
     </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">СРАВНИ ОФЕРТИ</button>
+
+    <!-- 4) For Whom & Top-Up -->
+    <div class="col-md-3">
+        <label class="form-label">ЗА КОГО Е ДЕПОЗИТА</label>
+        <select name="forWho" class="form-select">
+            @foreach (var f in forWhos)
+            {
+                <option value="@f" selected="@(f==selForWho)">@f</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">ДОВНАСЯНЕ НА СУМИ</label>
+        <select name="topUp" class="form-select">
+            @foreach (var t in topUps)
+            {
+                <option value="@t" selected="@(t==selTopUp)">@t</option>
+            }
+        </select>
+    </div>
+
+    <!-- 5) Interest Type & Overdraft -->
+    <div class="col-md-3">
+        <label class="form-label">ВИД ЛИХВА</label>
+        <select name="interestType" class="form-select">
+            @foreach (var it in interestTypes)
+            {
+                <option value="@it" selected="@(it==selIntType)">@it</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">ВЪЗМОЖНОСТ ЗА ОВЪРДРАФТ</label>
+        <select name="overdraft" class="form-select">
+            @foreach (var od in overdrafts)
+            {
+                <option value="@od" selected="@(od==selOvrd)">@od</option>
+            }
+        </select>
+    </div>
+
+    <!-- 6) Credit Facility -->
+    <div class="col-md-3">
+        <label class="form-label">ВЪЗМОЖНОСТ ЗА КРЕДИТ</label>
+        <select name="credit" class="form-select">
+            @foreach (var cr in credits)
+            {
+                <option value="@cr" selected="@(cr==selCredit)">@cr</option>
+            }
+        </select>
     </div>
 </form>
+
+<hr />
 
 <table class="table table-hover">
     <thead class="table-light">
@@ -51,14 +167,14 @@
             <tr>
                 <td>@d.BankName</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@d.Id">
-                        @d.DepositName
-                    </a>
+                    <a asp-action="Details" asp-route-id="@d.Id">@d.DepositName</a>
                 </td>
                 <td>@d.MinAmount?.ToString("N2")</td>
                 <td>@d.InterestPayout</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@d.Id" class="btn btn-sm btn-warning">
+                    <a asp-action="Details"
+                       asp-route-id="@d.Id"
+                       class="btn btn-sm btn-warning">
                         виж още
                     </a>
                 </td>
