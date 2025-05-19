@@ -1,0 +1,68 @@
+﻿@model List<BusinessLogic.Models.DepositCatalog>
+@{
+    ViewData["Title"] = "Резултати от сравнение на депозити";
+    var currencies = (List<string>)ViewData["Currencies"]!;
+    var payouts = (List<string>)ViewData["Payouts"]!;
+}
+
+<h1 class="landing-title">Резултати от сравнение на депозити</h1>
+
+@* Re-render the same filter form *@
+<form asp-action="Results" method="post" class="row g-3 align-items-end mb-4">
+    <div class="col-auto">
+        <label class="form-label fw-bold">ФИЛТРИРАЙ ПО:</label>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Валута</label>
+        <select name="currency" class="form-select">
+            @foreach (var c in currencies)
+            {
+                <option value="@c">@c</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Изплащане на лихви</label>
+        <select name="payout" class="form-select">
+            @foreach (var p in payouts)
+            {
+                <option value="@p">@p</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">СРАВНИ ОФЕРТИ</button>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Банка</th>
+            <th>Име на депозита</th>
+            <th>Минимална сума</th>
+            <th>Изплащане на лихви</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>@d.BankName</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@d.Id">
+                        @d.DepositName
+                    </a>
+                </td>
+                <td>@d.MinAmount?.ToString("N2")</td>
+                <td>@d.InterestPayout</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@d.Id" class="btn btn-sm btn-warning">
+                        виж още
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

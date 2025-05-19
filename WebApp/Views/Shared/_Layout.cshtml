@@ -1,16 +1,16 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="bg">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - Bank Products</title>
+    <title>@ViewData["Title"] - Моите Пари</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <!-- Add your custom site.css -->
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <div class="container mt-4">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-            <a class="navbar-brand" asp-controller="Deposit" asp-action="Index">Bank Products</a>
-        </nav>
         @RenderBody()
     </div>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

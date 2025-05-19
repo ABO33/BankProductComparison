@@ -1,22 +1,108 @@
-html {
-  font-size: 14px;
+﻿/* wwwroot/css/site.css */
+
+/* === Main Title === */
+.landing-title {
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4rem;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+/* === Grid of categories (2 rows of 5) === */
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 2rem 1rem;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* === Single category box === */
+.category {
+    flex: 0 0 calc(20% - 1rem);
+    max-width: calc(20% - 1rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    /* === Category title: one line, centered === */
+    .category h5 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 1rem; /* smaller so it fits */
+        white-space: nowrap; /* prevent wrap to two lines */
+    }
+
+    /* === Buttons: uniform width, smaller font, pill-shaped === */
+    .category .btn {
+        width: 200px; /* shrink to fit all pills on one row */
+        white-space: nowrap; /* keep text on one line */
+        font-size: 0.9rem; /* slightly smaller text */
+        border-radius: 9999px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    /* === Subcategory list === */
+    .category ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+    }
+
+        .category ul li {
+            position: relative;
+            padding-left: 1.2rem;
+            margin: 0.4rem 0;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+            /* Arrow glyph matching moitepari.bg */
+            .category ul li::before {
+                content: "\203A";
+                position: absolute;
+                left: 0;
+                top: 0;
+                color: currentColor;
+                font-weight: bold;
+            }
+
+            /* Links are plain text until hover */
+            .category ul li a {
+                color: inherit;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+                .category ul li a:hover {
+                    text-decoration: underline;
+                }
+
+/* === Responsive Breakpoints === */
+/* Tablet: three per row */
+@media (max-width: 992px) {
+    .category {
+        flex: 0 0 calc(33.333% - 1rem);
+        max-width: calc(33.333% - 1rem);
+    }
 }
 
-body {
-  margin-bottom: 60px;
+/* Mobile: two per row */
+@media (max-width: 768px) {
+    .category {
+        flex: 0 0 calc(50% - 1rem);
+        max-width: calc(50% - 1rem);
+    }
+}
+
+/* Small mobile: one per row */
+@media (max-width: 576px) {
+    .category {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 }

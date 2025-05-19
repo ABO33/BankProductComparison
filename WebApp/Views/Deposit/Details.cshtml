@@ -1,23 +1,76 @@
-﻿@model BusinessLogic.Models.Deposit
-
+﻿@model BusinessLogic.Models.DepositCatalog
 @{
-    ViewData["Title"] = "Deposit Details";
+    ViewData["Title"] = Model.DepositName;
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>@Model.BankName – @Model.DepositName</h2>
+<hr />
 
 <table class="table">
-    <tr><th>Name</th><td>@Model.Name</td></tr>
-    <tr><th>Bank</th><td>@Model.BankName</td></tr>
-    <tr><th>Currency</th><td>@Model.Currency</td></tr>
-    <tr><th>Min Amount</th><td>@Model.MinAmount</td></tr>
-    <tr><th>Max Amount</th><td>@Model.MaxAmount</td></tr>
-    <tr>
-        <th>Term (months)</th>
-        <td>@Model.MinTermMonths – @Model.MaxTermMonths</td>
-    </tr>
-    <tr><th>Interest Rate %</th><td>@Model.InterestRate</td></tr>
-    <tr><th>Tax Rate %</th><td>@Model.TaxRate</td></tr>
+    <tbody>
+        <tr>
+            <th>Тип на депозит</th>
+            <td>@Model.DepositType</td>
+        </tr>
+        <tr>
+            <th>Договорена лихва (описание)</th>
+            <td><pre class="m-0">@Model.ContractInterestDescription</pre></td>
+        </tr>
+        <tr>
+            <th>Вид лихва</th>
+            <td>@Model.InterestType</td>
+        </tr>
+        <tr>
+            <th>Капитализира ли се лихвата в срока на депозита?</th>
+            <td>@(Model.IsInterestCapitalized ? "Да" : "Не")</td>
+        </tr>
+        <tr>
+            <th>Изплащане на лихви</th>
+            <td>@Model.InterestPayout</td>
+        </tr>
+        <tr>
+            <th>Ежемесечно олихвяване</th>
+            <td>@(Model.IsMonthlyCompounding ? "Да" : "Не")</td>
+        </tr>
+        <tr>
+            <th>Валута</th>
+            <td>@Model.Currency</td>
+        </tr>
+        <tr>
+            <th>За кого е депозитът</th>
+            <td>@Model.ForWho</td>
+        </tr>
+        <tr>
+            <th>Минимална сума</th>
+            <td>@Model.MinAmount?.ToString("N2")</td>
+        </tr>
+        <tr>
+            <th>Минимална сума (описание)</th>
+            <td>@Model.MinAmountDescription</td>
+        </tr>
+        <tr>
+            <th>Минимален срок (месеци)</th>
+            <td>@Model.MinTermMonths</td>
+        </tr>
+        <tr>
+            <th>Максимален срок (месеци)</th>
+            <td>@Model.MaxTermMonths</td>
+        </tr>
+        <tr>
+            <th>Срокове валидни за депозита (описание)</th>
+            <td>@Model.ValidTermsDescription</td>
+        </tr>
+        <tr>
+            <th>Възможност за овърдрафт</th>
+            <td>@(Model.OverdraftAllowed ? "Да" : "Не")</td>
+        </tr>
+        <tr>
+            <th>Довнасяне на суми</th>
+            <td>@(Model.AllowsTopUp ? "Да" : "Не")</td>
+        </tr>
+        <tr>
+            <th>Допълнителни условия</th>
+            <td>@Model.AdditionalConditions</td>
+        </tr>
+    </tbody>
 </table>
-
-<a class="btn btn-secondary" asp-action="Index">Back to Catalog</a>

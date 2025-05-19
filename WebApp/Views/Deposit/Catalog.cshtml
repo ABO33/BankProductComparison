@@ -1,0 +1,82 @@
+﻿@model List<BusinessLogic.Models.DepositCatalog>
+@{
+    ViewData["Title"] = "Каталог депозити";
+    var total = Model.Count;
+    var banks = Model.Select(d => d.BankName).Distinct().Count();
+    var currencies = (List<string>)ViewData["Currencies"]!;
+    var payouts = (List<string>)ViewData["Payouts"]!;
+    var selectedCurrency = Context.Request.Query["currency"].FirstOrDefault() ?? "Всички";
+    var selectedPayout = Context.Request.Query["payout"].FirstOrDefault() ?? "Всички";
+}
+
+<h2 class="text-primary">
+    Депозит, влог – каталог на всички депозити –
+    <strong>@total</strong> срочни депозита от <strong>@banks</strong> банки
+</h2>
+<hr />
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-auto">
+        <label class="form-label fw-bold">ФИЛТРИРАЙ ПО:</label>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Валута</label>
+        <select name="currency" class="form-select">
+            @foreach (var c in currencies)
+            {
+                <option selected="@(c==selectedCurrency)"
+                        value="@c">@c</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Изплащане на лихви</label>
+        <select name="payout" class="form-select">
+            @foreach (var p in payouts)
+            {
+                <option selected="@(p==selectedPayout)"
+                        value="@p">@p</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Приложи</button>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Банка</th>
+            <th>Име на депозита</th>
+            <th>Минимална сума</th>
+            <th>Лихва</th>
+            <th>Изплащане на лихви</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>@d.BankName</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@d.Id">
+                        @d.DepositName
+                    </a>
+                </td>
+                <td>@d.MinAmount?.ToString("N2")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@d.Id">виж още</a>
+                </td>
+                <td>@d.InterestPayout</td>
+                <td>
+                    <a href="@d.AdditionalConditions"
+                       class="btn btn-sm btn-warning">
+                        Изчисли
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

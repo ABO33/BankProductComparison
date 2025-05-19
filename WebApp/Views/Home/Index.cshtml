@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Начало";
+}
+
+<h1 class="landing-title">Добре дошли в сравнение на банкови продукти</h1>
+
+<div class="categories">
+    <!-- Mortgage -->
+    <div class="category">
+        <h5>Ипотечни кредити</h5>
+        <a class="btn btn-primary" asp-action="WorkInProgress">СРАВНИ ОФЕРТИ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Каталог</a></li>
+            <li><a asp-action="WorkInProgress">Кредитна консултация</a></li>
+            <li><a asp-action="WorkInProgress">Референтни лихвени проценти</a></li>
+            <li><a asp-action="WorkInProgress">Селектирани оферти за имоти</a></li>
+        </ul>
+    </div>
+
+    <!-- Consumer -->
+    <div class="category">
+        <h5>Потребителски кредити</h5>
+        <a class="btn btn-primary" asp-action="WorkInProgress">СРАВНИ ОФЕРТИ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Каталог</a></li>
+            <li><a asp-action="WorkInProgress">Автокредити и лизинг</a></li>
+        </ul>
+    </div>
+
+    <!-- Deposits & Accounts -->
+    <div class="category">
+        <h5>Депозити и сметки</h5>
+        <!-- Main button now goes to HomeController.DepositCatalog -->
+        <a class="btn btn-primary"
+           asp-controller="Deposit"
+           asp-action="Index">
+            СРАВНИ ДЕПОЗИТИ
+        </a>        <ul>
+            <!-- First sub-link also to the real catalog -->
+            <li><a asp-action="DepositCatalog">Каталог депозити</a></li>
+            <li><a asp-action="WorkInProgress">Мобилно банкиране</a></li>
+            <li><a asp-action="WorkInProgress">Сравни Спестовни сметки</a></li>
+            <li><a asp-action="WorkInProgress">Каталог Спестовни сметки</a></li>
+            <li><a asp-action="WorkInProgress">Разплащателни сметки</a></li>
+        </ul>
+    </div>
+
+    <!-- Financial consulting -->
+    <div class="category">
+        <h5>Финансови консултации</h5>
+        <a class="btn btn-success" asp-action="WorkInProgress">ВИЖ ПОВЕЧЕ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Пенсионни консултации</a></li>
+            <li><a asp-action="WorkInProgress">Финансов коучинг</a></li>
+        </ul>
+    </div>
+
+    <!-- Calculators -->
+    <div class="category">
+        <h5>Калкулатори</h5>
+        <a class="btn btn-warning text-white" asp-action="WorkInProgress">КРЕДИТЕН КАЛКУЛАТОР</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Предсрочно погасяване</a></li>
+            <li><a asp-action="WorkInProgress">Инвестиционен калкулатор</a></li>
+            <li><a asp-action="WorkInProgress">Пенсионен калкулатор</a></li>
+            <li><a asp-action="WorkInProgress">За рефинансиране</a></li>
+            <li><a asp-action="WorkInProgress">Лизингов калкулатор</a></li>
+            <li><a asp-action="WorkInProgress">Всички</a></li>
+        </ul>
+    </div>
+
+    <!-- Pension Funds -->
+    <div class="category">
+        <h5>Пенсионни фондове</h5>
+        <a class="btn btn-danger" asp-action="WorkInProgress">СРАВНИ ОФЕРТИ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Съвети за пенсионни фондове</a></li>
+            <li><a asp-action="WorkInProgress">Пенсионен калкулатор</a></li>
+        </ul>
+    </div>
+
+    <!-- Cards -->
+    <div class="category">
+        <h5>Картови продукти</h5>
+        <a class="btn btn-info text-white" asp-action="WorkInProgress">КРЕДИТНИ КАРТИ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Каталог Кредитни карти</a></li>
+            <li><a asp-action="WorkInProgress">Дебитни карти</a></li>
+            <li><a asp-action="WorkInProgress">Каталог Дебитни карти</a></li>
+        </ul>
+    </div>
+
+    <!-- Investments -->
+    <div class="category">
+        <h5>Инвестиции</h5>
+        <a class="btn btn-secondary" asp-action="WorkInProgress">ВЗАИМНИ ФОНДОВЕ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Съвети за взаимни фондове</a></li>
+            <li><a asp-action="WorkInProgress">Търговия с акции</a></li>
+            <li><a asp-action="WorkInProgress">Търговия с ETF</a></li>
+            <li><a asp-action="WorkInProgress">Приватизационни фондове</a></li>
+        </ul>
+    </div>
+
+    <!-- Quick Loans -->
+    <div class="category">
+        <h5>Бързи кредити</h5>
+        <a class="btn btn-success" asp-action="WorkInProgress">СРАВНИ ОФЕРТИ</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Каталог</a></li>
+            <li><a asp-action="WorkInProgress">Съвети за бързи кредити</a></li>
+        </ul>
+    </div>
+
+    <!-- Club MoiTePari -->
+    <div class="category">
+        <h5>Клуб МОИТЕПАРИ</h5>
+        <a class="btn btn-dark text-white" asp-action="WorkInProgress">ВХОД</a>
+        <ul>
+            <li><a asp-action="WorkInProgress">Моите Сметки</a></li>
+            <li><a asp-action="WorkInProgress">СТАНИ ЧЛЕН</a></li>
+        </ul>
+    </div>
+</div>
