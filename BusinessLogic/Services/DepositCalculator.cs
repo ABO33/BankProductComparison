@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BusinessLogic.Data;
 using BusinessLogic.Models;
 
@@ -7,36 +9,72 @@ namespace BusinessLogic.Services
 {
     public class DepositCalculator
     {
-        private readonly DepositContext _context;
+        private readonly DepositContext _ctx;
+        public DepositCalculator(DepositContext ctx) => _ctx = ctx;
 
-        public DepositCalculator(DepositContext context)
+        // parse lines like "за срок от 6 месеца - 2.50%"
+        private Dictionary<int, decimal> ParseTermRates(string? desc)
         {
-            _context = context;
+            var map = new Dictionary<int, decimal>();
+            if (string.IsNullOrWhiteSpace(desc)) return map;
+            var rx = new Regex(@"за срок от\s+(\d+)\s+месец[^\-]*-\s*([\d\.]+)%", RegexOptions.IgnoreCase);
+            foreach (var line in desc.Split('\n', '\r').Select(l => l.Trim()).Where(l => l.Length > 0))
+            {
+                var m = rx.Match(line);
+                if (!m.Success) continue;
+                int term = int.Parse(m.Groups[1].Value);
+                decimal rate = decimal.Parse(m.Groups[2].Value);
+                map[term] = rate;
+            }
+            return map;
         }
 
-        public CalculationResult Calculate(int depositId, CalculationParameters parameters)
+        /// <summary>
+        /// Builds a per-period schedule for a catalog entry.
+        /// </summary>
+        public List<ScheduleEntry> CalculateSchedule(
+            DepositCatalog catalog, decimal amount, int termMonths)
         {
-            var deposit = _context.Deposits.FirstOrDefault(d => d.Id == depositId);
-            if (deposit == null)
-                throw new ArgumentException("Deposit not found");
+            // lookup the total rate for this term
+            var rates = ParseTermRates(catalog.ContractInterestDescription);
+            if (!rates.TryGetValue(termMonths, out decimal totalRate))
+                throw new ArgumentException($"No rate for {termMonths} months");
 
-            if (parameters.Amount < deposit.MinAmount || parameters.Amount > deposit.MaxAmount)
-                throw new ArgumentException("Amount out of allowed range");
-            if (parameters.TermMonths < deposit.MinTermMonths || parameters.TermMonths > deposit.MaxTermMonths)
-                throw new ArgumentException("Term out of allowed range");
+            decimal monthlyRate = totalRate / 100m / 12m;
+            decimal taxRate = catalog.TaxRate / 100m;
 
-            // Interest = P * r% * (months/12)
-            var interest = parameters.Amount * deposit.InterestRate / 100m * parameters.TermMonths / 12m;
-            var tax = interest * deposit.TaxRate / 100m;
-            var net = interest - tax;
-
-            return new CalculationResult
+            var schedule = new List<ScheduleEntry>();
+            for (int m = 1; m <= termMonths; m++)
             {
-                GrossInterest = Decimal.Round(interest, 2),
-                TaxAmount = Decimal.Round(tax, 2),
-                NetInterest = Decimal.Round(net, 2),
-                TotalPayable = Decimal.Round(parameters.Amount + net, 2)
-            };
+                if (m < termMonths)
+                {
+                    schedule.Add(new ScheduleEntry
+                    {
+                        Period = m,
+                        DepositAmount = amount,
+                        InterestRate = 0m,
+                        InterestGross = 0m,
+                        Tax = 0m,
+                        TotalPayout = amount
+                    });
+                }
+                else
+                {
+                    decimal gross = amount * monthlyRate * termMonths;
+                    decimal tax = gross * taxRate;
+                    decimal net = gross - tax;
+                    schedule.Add(new ScheduleEntry
+                    {
+                        Period = m,
+                        DepositAmount = amount,
+                        InterestRate = totalRate,
+                        InterestGross = gross,
+                        Tax = tax,
+                        TotalPayout = amount + net
+                    });
+                }
+            }
+            return schedule;
         }
     }
 }

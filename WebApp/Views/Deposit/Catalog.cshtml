@@ -24,8 +24,7 @@
         <select name="currency" class="form-select">
             @foreach (var c in currencies)
             {
-                <option selected="@(c==selectedCurrency)"
-                        value="@c">@c</option>
+                <option selected="@(c==selectedCurrency)" value="@c">@c</option>
             }
         </select>
     </div>
@@ -34,8 +33,7 @@
         <select name="payout" class="form-select">
             @foreach (var p in payouts)
             {
-                <option selected="@(p==selectedPayout)"
-                        value="@p">@p</option>
+                <option selected="@(p==selectedPayout)" value="@p">@p</option>
             }
         </select>
     </div>
@@ -71,10 +69,11 @@
                 </td>
                 <td>@d.InterestPayout</td>
                 <td>
-                    <a href="@d.AdditionalConditions"
-                       class="btn btn-sm btn-warning">
-                        Изчисли
-                    </a>
+                    <a asp-controller="Deposit"
+                       asp-action="PaymentSchedule"
+                       asp-route-id="@d.Id"
+                       class="btn btn-sm btn-warning">Изчисли</a>
+
                 </td>
             </tr>
         }

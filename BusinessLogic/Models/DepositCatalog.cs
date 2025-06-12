@@ -17,6 +17,7 @@
         public string? Currency { get; set; }
         public string? ForWho { get; set; }
         public decimal? MinAmount { get; set; }
+        public decimal? MaxAmount { get; set; }
         public string? MinAmountDescription { get; set; }
         public int? MaxTermMonths { get; set; }
         public int? MinTermMonths { get; set; }
@@ -24,5 +25,7 @@
         public bool OverdraftAllowed { get; set; }
         public bool AllowsTopUp { get; set; }
         public string? AdditionalConditions { get; set; }
+        public decimal InterestRate { get; set; }  // annual percent
+        public decimal TaxRate { get; set; }       // percent
     }
 }

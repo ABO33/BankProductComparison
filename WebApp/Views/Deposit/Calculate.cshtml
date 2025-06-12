@@ -1,35 +1,37 @@
 ﻿@model WebApp.Models.CalculationViewModel
 
 @{
-    ViewData["Title"] = "Calculate Interest";
+    ViewData["Title"] = "Детайли за депозит";
 }
 
-<h2>@ViewData["Title"] for @Model.Deposit.Name</h2>
+<h2>@Model.Deposit.DepositName</h2>
+<hr />
+
+<form asp-action="Calculate" method="post">
+    <input type="hidden" asp-for="Deposit.Id" />
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Сума</label>
+        <input asp-for="Amount" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="TermMonths" class="form-label">Срок (месеци)</label>
+        <input asp-for="TermMonths" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Изчисли</button>
+</form>
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
+    <div class="alert alert-danger mt-3">@Model.ErrorMessage</div>
 }
-
-<form asp-action="Calculate" method="post">
-    <div class="form-group">
-        <label>Amount (@Model.Deposit.Currency)</label>
-        <input asp-for="Amount" class="form-control" step="0.01" />
-    </div>
-    <div class="form-group">
-        <label>Term (months)</label>
-        <input asp-for="TermMonths" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Calculate</button>
-</form>
-
 @if (Model.Result != null)
 {
-    <h3 class="mt-4">Results</h3>
+    <h3 class="mt-4">Резултат от изчислението</h3>
     <table class="table">
-        <tr><th>Gross Interest</th><td>@Model.Result.GrossInterest</td></tr>
-        <tr><th>Tax</th><td>@Model.Result.TaxAmount</td></tr>
-        <tr><th>Net Interest</th><td>@Model.Result.NetInterest</td></tr>
-        <tr><th>Total Payable</th><td>@Model.Result.TotalPayable</td></tr>
+        <tr><th>Брутна лихва</th><td>@Model.Result.GrossInterest:N2</td></tr>
+        <tr><th>Данъци</th>         <td>@Model.Result.TaxAmount:N2</td></tr>
+        <tr><th>Нетна лихва</th>    <td>@Model.Result.NetInterest:N2</td></tr>
+        <tr><th>Общо изплатено</th><td>@Model.Result.TotalPayable:N2</td></tr>
     </table>
 }
