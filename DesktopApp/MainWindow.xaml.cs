@@ -15,44 +15,61 @@ namespace DesktopApp
         {
             InitializeComponent();
 
+            // Build configuration from appsettings.json next to the EXE
             var config = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var conn = config.GetConnectionString("DefaultConnection");
+            // Read the DefaultConnection string
+            var connString = config.GetConnectionString("DefaultConnection");
 
+            // Configure EF Core with MySQL
             var options = new DbContextOptionsBuilder<DepositContext>()
-                .UseMySql(conn!, ServerVersion.AutoDetect(conn!))
+                .UseMySql(connString, ServerVersion.AutoDetect(connString))
                 .Options;
 
             _context = new DepositContext(options);
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var deposit = new Deposit
+                var item = new DepositCatalog
                 {
-                    Name = txtName.Text,
-                    BankName = txtBank.Text,
+                    BankName = txtBankName.Text,
+                    DepositName = txtDepositName.Text,
+                    DepositType = txtDepositType.Text,
+                    ContractInterestDescription = txtContractDesc.Text,
+                    InterestType = txtInterestType.Text,
+                    IsInterestCapitalized = chkCapitalized.IsChecked == true,
+                    InterestPayout = txtInterestPayout.Text,
+                    IsMonthlyCompounding = chkMonthlyCompounding.IsChecked == true,
                     Currency = txtCurrency.Text,
+                    ForWho = txtForWho.Text,
                     MinAmount = decimal.Parse(txtMinAmount.Text),
                     MaxAmount = decimal.Parse(txtMaxAmount.Text),
+                    MinAmountDescription = txtMinAmountDesc.Text,
                     MinTermMonths = int.Parse(txtMinTerm.Text),
                     MaxTermMonths = int.Parse(txtMaxTerm.Text),
-                    InterestRate = decimal.Parse(txtInterestRate.Text),
+                    ValidTermsDescription = txtValidTerms.Text,
+                    OverdraftAllowed = chkOverdraft.IsChecked == true,
+                    AllowsTopUp = chkTopUp.IsChecked == true,
+                    AdditionalConditions = txtAdditionalConditions.Text,
                     TaxRate = decimal.Parse(txtTaxRate.Text)
                 };
 
-                _context.Deposits.Add(deposit);
+                _context.DepositCatalogs.Add(item);
                 _context.SaveChanges();
 
-                MessageBox.Show("Deposit saved successfully.");
+                MessageBox.Show("Депозитът е записан успешно!", "Успех",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show($"Грешка при запис: {ex.Message}", "Грешка",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

@@ -1,21 +1,30 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- Prevent auto‐generation of duplicate AssemblyInfo -->
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.*" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.*" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.*" />
-		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.*" />
-	</ItemGroup>
-
+	<!-- Reference your BusinessLogic project -->
 	<ItemGroup>
 		<ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+	</ItemGroup>
+
+	<!-- NuGet packages: align all EF Core libs with BusinessLogic (8.0.16) -->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.16" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
+	</ItemGroup>
+
+	<!-- Always copy your JSON config to the output folder -->
+	<ItemGroup>
+		<Content Include="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 </Project>

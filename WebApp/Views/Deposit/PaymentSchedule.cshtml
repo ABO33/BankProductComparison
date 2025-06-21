@@ -1,95 +1,76 @@
 ﻿@model WebApp.Models.PaymentScheduleViewModel
-
 @{
+    Layout = "_Layout";
     ViewData["Title"] = "Разплащателен план";
-    bool singleTerm = Model.Terms.Count == 1;
+    bool single = Model.Terms.Count == 1;
 }
+<div class="card shadow-sm bg-white rounded p-4">
+    <h2 class="text-primary">Разплащателен план: @Model.DepositName</h2>
 
-<h2>Разплащателен план: @Model.DepositName</h2>
-<hr />
+    <form asp-action="PaymentSchedule" method="post" class="mb-4">
+        <input type="hidden" asp-for="DepositId" />
+        @if (single)
+        {
+            <input type="hidden" asp-for="SelectedTerm" />
+        }
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
-}
-
-<form asp-action="PaymentSchedule" method="post" class="mb-4">
-    <input type="hidden" asp-for="DepositId" />
-    @if (singleTerm)
-    {
-        <input type="hidden" asp-for="SelectedTerm" />
-    }
-
-    <div class="row g-3">
-        <div class="col-md-3">
-            <label asp-for="SelectedCurrency" class="form-label">Валута</label>
-            <select asp-for="SelectedCurrency" class="form-select" disabled>
-                @foreach (var c in Model.Currencies)
-                {
-                    <option selected="@c.Selected" value="@c.Value">@c.Text</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label asp-for="Amount" class="form-label">Сума</label>
-            <input asp-for="Amount" class="form-control" />
-        </div>
-        <div class="col-md-3">
-            <label asp-for="SelectedTerm" class="form-label">Срок (м.)</label>
-            @if (singleTerm)
-            {
-                <select asp-for="SelectedTerm" class="form-select" disabled>
-                    @foreach (var t in Model.Terms)
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Валута</label>
+                <select asp-for="SelectedCurrency" class="form-select" disabled>
+                    @foreach (var c in Model.Currencies)
                     {
-                        <option selected="@t.Selected" value="@t.Value">@t.Text</option>
+                        <option selected="@c.Selected" value="@c.Value">@c.Text</option>
                     }
                 </select>
-            }
-            else
-            {
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Сума</label>
+                <input asp-for="Amount" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Срок</label>
                 <select asp-for="SelectedTerm" class="form-select">
                     @foreach (var t in Model.Terms)
                     {
                         <option selected="@t.Selected" value="@t.Value">@t.Text</option>
                     }
                 </select>
-            }
+            </div>
         </div>
-        <div class="col-auto align-self-end">
-            <button type="submit" class="btn btn-primary">Изчисли</button>
-        </div>
-    </div>
-</form>
 
-@if (Model.Schedule != null)
-{
-    <h3>График на плащания</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>№</th>
-                <th>Депозирана сума</th>
-                <th>Лихва (%)</th>
-                <th>Вноска лихва</th>
-                <th>Данък върху лихвата</th>
-                <th>Нетно изплатени</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                int i = 1;
-                foreach (var row in Model.Schedule)
+        <button type="submit" class="btn btn-primary mt-4">Изчисли</button>
+    </form>
+
+    @if (Model.Schedule != null)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Сума</th>
+                    <th>Лихва (%)</th>
+                    <th>Вноска лихва</th>
+                    <th>Данък</th>
+                    <th>Нетно</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = 1;
+                }
+                @foreach (var r in Model.Schedule)
                 {
                     <tr>
-                        <td>@(i++)</td>
-                        <td>@row.DepositAmount.ToString("N2")</td>
-                        <td>@(row.InterestRate.ToString("N2"))</td>
-                        <td>@row.InterestGross.ToString("N2")</td>
-                        <td>@row.Tax.ToString("N2")</td>
-                        <td>@row.TotalPayout.ToString("N2")</td>
+                        <td>@r.Period</td>
+                        <td>@r.DepositAmount.ToString("N2")</td>
+                        <td>@r.InterestRate.ToString("N2")</td>
+                        <td>@r.InterestGross.ToString("N2")</td>
+                        <td>@r.Tax.ToString("N2")</td>
+                        <td>@r.TotalPayout.ToString("N2")</td>
                     </tr>
                 }
-            }
-        </tbody>
-    </table>
-}
+            </tbody>
+        </table>
+    }
+</div>

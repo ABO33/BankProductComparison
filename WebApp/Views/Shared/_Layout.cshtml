@@ -1,16 +1,113 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var title = ViewData["Title"] as string ?? "";
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString();
+    var act = ViewContext.RouteData.Values["action"]?.ToString();
+    bool showBack = !(ctrl == "Home" && act == "Index") && !(ctrl == "Deposit" && act == "Index");
+}
+<!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - Моите Пари</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
-    <!-- Add your custom site.css -->
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title – ABO Bank</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <style>
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-item .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            min-width: 280px;
+            max-width: 380px;
+            margin-top: 0.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .mega-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mega-col h6 {
+            font-weight: 600;
+            margin-bottom: .75rem;
+        }
+
+        .mega-col a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: .5rem;
+            padding: 0.25rem 0;
+            transition: all 0.2s ease;
+        }
+
+        .mega-col a:hover {
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+
+    </style>
 </head>
-<body>
-    <div class="container mt-4">
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container position-relative">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">ABO Bank</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#">Категории</a>
+                        <div class="dropdown-menu text-start">
+                            <div class="mega-col">
+                                <h6>Депозити и сметки</h6>
+                                <a asp-controller="Deposit" asp-action="Index">Сравни депозити</a>
+                                <a asp-controller="Deposit" asp-action="Catalog">Каталог депозити</a>
+                                <a asp-controller="Shared" asp-action="WorkInProgress">Мобилно банкиране</a>
+                                <a asp-controller="Shared" asp-action="WorkInProgress">Сравни спестовни сметки</a>
+                                <a asp-controller="Shared" asp-action="WorkInProgress">Каталог спестовни сметки</a>
+                                <a asp-controller="Shared" asp-action="WorkInProgress">Разплащателни сметки</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container flex-fill py-4">
+        @if (showBack)
+        {
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mb-3">&larr; Назад</a>
+        }
         @RenderBody()
-    </div>
+    </main>
+
+    <footer class="bg-white border-top py-3 mt-auto">
+        <div class="container text-center text-muted">© 2025 ABO Bank</div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
