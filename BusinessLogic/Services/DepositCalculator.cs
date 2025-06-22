@@ -137,6 +137,42 @@ namespace BusinessLogic.Services
                     }
                     break;
 
+                case "на край на период":
+                    var periodicSteps = ParseTermSteps(catalog);
+                    int prevStepMonth = 0;
+                    decimal accumulatedNetInterest = 0;
+
+                    foreach (var step in periodicSteps)
+                    {
+                        if (step.Key > termMonths)
+                            break;
+
+                        int monthsInStep = step.Key - prevStepMonth;
+                        decimal stepRate = step.Value;
+                        decimal gross = Math.Round(amount * (stepRate / 100m) * (monthsInStep / 12m), 2);
+                        decimal tax = Math.Round(gross * taxRate, 2);
+                        decimal net = gross - tax;
+                        accumulatedNetInterest += net;
+
+                        for (int m = prevStepMonth + 1; m <= step.Key; m++)
+                        {
+                            bool isFinalMonth = m == termMonths;
+
+                            schedule.Add(new ScheduleEntry
+                            {
+                                Period = m,
+                                DepositAmount = amount,
+                                InterestRate = (m == step.Key) ? stepRate : 0,
+                                InterestGross = (m == step.Key) ? gross : 0,
+                                Tax = (m == step.Key) ? tax : 0,
+                                TotalPayout = isFinalMonth ? amount + accumulatedNetInterest : amount
+                            });
+                        }
+
+                        prevStepMonth = step.Key;
+                    }
+                    break;
+
                 case string s when s.StartsWith("с нарастваща"):
                     // stepped interest: parse additional term marchpoints from catalog, e.g. every 6 months
                     var steps = ParseTermSteps(catalog); // implement separately
