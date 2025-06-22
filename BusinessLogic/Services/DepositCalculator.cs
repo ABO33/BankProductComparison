@@ -12,9 +12,6 @@ namespace BusinessLogic.Services
         private readonly DepositContext _ctx;
         public DepositCalculator(DepositContext ctx) => _ctx = ctx;
 
-        // parse lines like:
-        // "за срок от 6 месеца - 2.50%"
-        // or "за 6 месеца - 0.10 %"
         private Dictionary<int, decimal> ParseTermRates(string? desc)
         {
             var map = new Dictionary<int, decimal>();
@@ -23,7 +20,6 @@ namespace BusinessLogic.Services
             var lines = desc.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
                             .Select(l => l.Trim());
 
-            // Match patterns like "за 6 месеца - 0.10 %" or "за срок от 6 месеца - 0.10%"
             var rx = new Regex(@"за(?:\s+срок\s+от)?\s*(\d+)\s+месец[а]?[^-]*-\s*([\d\.,]+)\s*%", RegexOptions.IgnoreCase);
 
             foreach (var line in lines)
@@ -69,10 +65,6 @@ namespace BusinessLogic.Services
             return list;
         }
 
-
-        /// <summary>
-        /// Builds a per-period schedule for a catalog entry.
-        /// </summary>
         public List<ScheduleEntry> CalculateSchedule(
             DepositCatalog catalog, decimal amount, int termMonths)
         {
@@ -109,22 +101,62 @@ namespace BusinessLogic.Services
                     break;
 
                 case "на падеж":
-                    for (int m = 1; m < termMonths; m++)
+                    var steps = ParseTermSteps(catalog);
+                    if (steps.Count > 1)
                     {
-                        schedule.Add(new ScheduleEntry
+                        int payoutLastStep = 0;
+                        decimal lastRate = 0;
+                        decimal accumulatedNet = 0;
+
+                        for (int m = 1; m <= termMonths; m++)
                         {
-                            Period = m,
-                            DepositAmount = amount,
-                            InterestRate = 0,
-                            InterestGross = 0,
-                            Tax = 0,
-                            TotalPayout = amount
-                        });
+                            decimal gross = 0, tax = 0, net = 0, rate = 0;
+
+                            if (steps.Any(s => s.Key == m))
+                            {
+                                var step = steps.First(s => s.Key == m);
+                                int periodMonths = step.Key - payoutLastStep;
+                                rate = step.Value;
+                                gross = Math.Round(amount * (rate / 100m) * (periodMonths / 12m), 2);
+                                tax = Math.Round(gross * taxRate, 2);
+                                net = gross - tax;
+
+                                payoutLastStep = step.Key;
+                                lastRate = rate;
+                                accumulatedNet += net;
+                            }
+
+                            bool isFinal = m == termMonths;
+                            schedule.Add(new ScheduleEntry
+                            {
+                                Period = m,
+                                DepositAmount = amount,
+                                InterestRate = rate,
+                                InterestGross = gross,
+                                Tax = tax,
+                                TotalPayout = isFinal ? amount + accumulatedNet : amount
+                            });
+                        }
                     }
+                    else
                     {
+                        for (int m = 1; m < termMonths; m++)
+                        {
+                            schedule.Add(new ScheduleEntry
+                            {
+                                Period = m,
+                                DepositAmount = amount,
+                                InterestRate = 0,
+                                InterestGross = 0,
+                                Tax = 0,
+                                TotalPayout = amount
+                            });
+                        }
+
                         decimal gross = Math.Round(amount * totalRate / 100m, 2);
                         decimal tax = Math.Round(gross * taxRate, 2);
                         decimal net = gross - tax;
+
                         schedule.Add(new ScheduleEntry
                         {
                             Period = termMonths,
@@ -174,11 +206,10 @@ namespace BusinessLogic.Services
                     break;
 
                 case string s when s.StartsWith("с нарастваща"):
-                    // stepped interest: parse additional term marchpoints from catalog, e.g. every 6 months
-                    var steps = ParseTermSteps(catalog); // implement separately
+                    var steps2 = ParseTermSteps(catalog);
                     decimal currentBalance = amount;
                     int lastStep = 0;
-                    foreach (var step in steps.Append(new KeyValuePair<int, decimal>(termMonths, rates[termMonths])))
+                    foreach (var step in steps2.Append(new KeyValuePair<int, decimal>(termMonths, rates[termMonths])))
                     {
                         int monthsInStep = step.Key - lastStep;
                         decimal stepRate = step.Value / 100m / 12m;
@@ -229,6 +260,5 @@ namespace BusinessLogic.Services
 
             return schedule;
         }
-
     }
 }

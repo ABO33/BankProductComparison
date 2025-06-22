@@ -3,7 +3,7 @@
     var title = ViewData["Title"] as string ?? "";
     var ctrl = ViewContext.RouteData.Values["controller"]?.ToString();
     var act = ViewContext.RouteData.Values["action"]?.ToString();
-    bool showBack = !(ctrl == "Home" && act == "Index") && !(ctrl == "Deposit" && act == "Index");
+    bool showBack = !(ctrl == "Home" && act == "Index");
 }
 <!DOCTYPE html>
 <html lang="bg">
@@ -14,20 +14,13 @@
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/css/site.css" rel="stylesheet" />
     <style>
-        .nav-item.dropdown {
-            position: relative;
+        .dropdown-toggle::after {
+            display: none;
         }
 
-        .nav-item .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: auto;
+        .dropdown-menu {
             min-width: 280px;
             max-width: 380px;
-            margin-top: 0.5rem;
             padding: 1rem;
             border-radius: 0.5rem;
             background: #fff;
@@ -35,34 +28,29 @@
             z-index: 1000;
         }
 
-        .nav-item.dropdown:hover .dropdown-menu {
-            display: block;
-        }
-
         .mega-col {
             display: flex;
             flex-direction: column;
         }
 
-        .mega-col h6 {
-            font-weight: 600;
-            margin-bottom: .75rem;
-        }
+            .mega-col h6 {
+                font-weight: 600;
+                margin-bottom: .75rem;
+            }
 
-        .mega-col a {
-            display: block;
-            color: #333;
-            text-decoration: none;
-            margin-bottom: .5rem;
-            padding: 0.25rem 0;
-            transition: all 0.2s ease;
-        }
+            .mega-col a {
+                display: block;
+                color: #333;
+                text-decoration: none;
+                margin-bottom: .5rem;
+                padding: 0.25rem 0;
+                transition: all 0.2s ease;
+            }
 
-        .mega-col a:hover {
-            color: #0d6efd;
-            text-decoration: underline;
-        }
-
+                .mega-col a:hover {
+                    color: #0d6efd;
+                    text-decoration: underline;
+                }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -77,8 +65,11 @@
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link" href="#">Категории</a>
-                        <div class="dropdown-menu text-start">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Категории
+                        </a>
+                        <div class="dropdown-menu text-start" aria-labelledby="categoriesDropdown">
                             <div class="mega-col">
                                 <h6>Депозити и сметки</h6>
                                 <a asp-controller="Deposit" asp-action="Index">Сравни депозити</a>
@@ -98,7 +89,7 @@
     <main class="container flex-fill py-4">
         @if (showBack)
         {
-            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mb-3">&larr; Назад</a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">&larr; Назад</a>
         }
         @RenderBody()
     </main>
